@@ -85,7 +85,7 @@ function custom_hitsound()
     var userid = entity.get_player_for_user_id(current_event.get_int("userid"))
     var attacker = entity.get_player_for_user_id(current_event.get_int("attacker"))
 
-    if (attacker == entity.get_local_player() && userid != entity.get_local_player())
+    if (attacker == entity.get_local_player() && userid != entity.get_local_player() && vars.get_bool('js.custom_hitsound'))
         utils.play_sound("C:\\Ouki76\\hit.wav");
 }
 
@@ -96,62 +96,44 @@ ui.add_checkbox('Background', 'snow_background')
 function snow_background() 
 {
     points: [];
-	if (!vars.get_bool('js.snow_background'))
-		return;
+    if (!vars.get_bool('js.snow_background'))
+        return;
 
-	var alpha = ui.get_menu_alpha();
-	var count = 50;
-	var fps = 1 / global_vars.frametime()
+    var alpha = ui.get_menu_alpha();
+    var count = 50;
+    var fps = 1 / global_vars.frametime()
 
-	if (!alpha) return;
+    if (!alpha) return;
 
-	render.filled_rect([0, 0], screen_size, [0, 0, 0, 120 * alpha], 0);
+    render.filled_rect([0, 0], screen_size, [0, 0, 0, 120 * alpha], 0);
 
-	if (points.length < count)
+    if (points.length < count)
         points.push([math.random_int(0, screen_size[0]), math.random_int(0, screen_size[1]), math.random_int(-1, 2), math.random_int(-1, 2)])
 
-	for (i = 0; i < points.length; i++) {
-		var x = points[i][0];
-	    var y = points[i][1];
-	    var position = [x, y];
-	    var vspeed = points[i][2];
-	    var hspeed = points[i][3];
+    for (i = 0; i < points.length; i++) {
+        var x = points[i][0];
+        var y = points[i][1];
+        var position = [x, y];
+        var vspeed = points[i][2];
+        var hspeed = points[i][3];
 
-	    if (position[0] > screen_size[0] || position[0] < 0 || position[1] > screen_size[1] || position[1] < 0) {
-	        points[i][0] = math.random_int(0, screen_size[0]);
-	        points[i][1] = math.random_int(0, screen_size[1]);
-	        points[i][2] = math.random_int(-1, 2);
-	        points[i][3] = math.random_int(-1, 2);
-	    }
+        if (position[0] > screen_size[0] || position[0] < 0 || position[1] > screen_size[1] || position[1] < 0) {
+            points[i][0] = math.random_int(0, screen_size[0]);
+            points[i][1] = math.random_int(0, screen_size[1]);
+            points[i][2] = math.random_int(-1, 2);
+            points[i][3] = math.random_int(-1, 2);
+        }
 
-	    if (points[i][2] == 0) points[i][2] = 1;
-	    if (points[i][3] == 0) points[i][3] = 1;
+        if (points[i][2] == 0) points[i][2] = 1;
+        if (points[i][3] == 0) points[i][3] = 1;
 
-		render.text(position, [255, 255, 255, 255 * alpha], 12, 3, "*");
-		points[i][0] = points[i][0] + vspeed / fps * 20;
-		points[i][1] = points[i][1] + hspeed / fps * 20;
-	}
+        render.text(position, [255, 255, 255, 255 * alpha], 12, 3, "*");
+        points[i][0] = points[i][0] + vspeed / fps * 20;
+        points[i][1] = points[i][1] + hspeed / fps * 20;
+    }
 }
 
 register_callback('render', snow_background)
-
-/*ui.add_checkbox('Save settings', 'save_settings')
-ui.add_checkbox('Load settings', 'load_settings')
-
-Еще не придумал, как можно сделать
-function settings()
-{
-    if (vars.get_bool('js.save_settings'))
-    {
-        vars.set_bool('js.save_settings', false);
-        cheat.log('Settings have been saved!');
-    }
-    if (vars.get_bool('js.load_settings'))
-    {
-        vars.set_bool('js.save_settings', false);
-        cheat.log('Settings have been loaded!');
-    }
-}*/
 
 function Bye()
 {
