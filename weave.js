@@ -1,7 +1,9 @@
 cheat.log("Hello user!");
 cheat.print_to_console("Script load, hello User!", [1, 1, 255]);
+utils.play_sound("C:\\Ouki76\\start.wav")
 
 var screen_size = render.get_screen_size(); // [1680, 1050]
+var localPlayer = entity.get_local_player();
 
 function HSVtoRGB(h, s, v) {
     var r, g, b, i, f, p, q, t;
@@ -45,7 +47,7 @@ ui.add_checkbox('Custom keybind list', 'custom_keybind_list')
 ui.add_slider('Keybind poss X', 'keybind_poss_x', 0, screen_size[0])
 ui.add_slider('Keybind poss Y', 'keybind_poss_y', 0, screen_size[1])
 
-function keybinds() {
+function custom_keybind_list() {
     var keybinds_list = [
         ["doubletap", "Double Tap"],
         ["override_damage", "Minimum Damage"],
@@ -74,4 +76,87 @@ function keybinds() {
         }
     }
 }
-register_callback('render', keybinds);
+register_callback('render', custom_keybind_list);
+
+ui.add_checkbox('Custom hitsound', 'custom_hitsound')
+
+function custom_hitsound()
+{
+    var userid = entity.get_player_for_user_id(current_event.get_int("userid"))
+    var attacker = entity.get_player_for_user_id(current_event.get_int("attacker"))
+
+    if (attacker == entity.get_local_player() && userid != entity.get_local_player())
+        utils.play_sound("C:\\Ouki76\\hit.wav");
+}
+
+register_callback('player_hurt', custom_hitsound)
+
+ui.add_checkbox('Background', 'snow_background')
+
+function snow_background() 
+{
+    points: [];
+	if (!vars.get_bool('js.snow_background'))
+		return;
+
+	var alpha = ui.get_menu_alpha();
+	var count = 50;
+	var fps = 1 / global_vars.frametime()
+
+	if (!alpha) return;
+
+	render.filled_rect([0, 0], screen_size, [0, 0, 0, 120 * alpha], 0);
+
+	if (points.length < count)
+        points.push([math.random_int(0, screen_size[0]), math.random_int(0, screen_size[1]), math.random_int(-1, 2), math.random_int(-1, 2)])
+
+	for (i = 0; i < points.length; i++) {
+		var x = points[i][0];
+	    var y = points[i][1];
+	    var position = [x, y];
+	    var vspeed = points[i][2];
+	    var hspeed = points[i][3];
+
+	    if (position[0] > screen_size[0] || position[0] < 0 || position[1] > screen_size[1] || position[1] < 0) {
+	        points[i][0] = math.random_int(0, screen_size[0]);
+	        points[i][1] = math.random_int(0, screen_size[1]);
+	        points[i][2] = math.random_int(-1, 2);
+	        points[i][3] = math.random_int(-1, 2);
+	    }
+
+	    if (points[i][2] == 0) points[i][2] = 1;
+	    if (points[i][3] == 0) points[i][3] = 1;
+
+		render.text(position, [255, 255, 255, 255 * alpha], 12, 3, "*");
+		points[i][0] = points[i][0] + vspeed / fps * 20;
+		points[i][1] = points[i][1] + hspeed / fps * 20;
+	}
+}
+
+register_callback('render', snow_background)
+
+/*ui.add_checkbox('Save settings', 'save_settings')
+ui.add_checkbox('Load settings', 'load_settings')
+
+Еще не придумал, как можно сделать
+function settings()
+{
+    if (vars.get_bool('js.save_settings'))
+    {
+        vars.set_bool('js.save_settings', false);
+        cheat.log('Settings have been saved!');
+    }
+    if (vars.get_bool('js.load_settings'))
+    {
+        vars.set_bool('js.save_settings', false);
+        cheat.log('Settings have been loaded!');
+    }
+}*/
+
+function Bye()
+{
+    utils.play_sound('C:\\Ouki76\\bye.wav')
+    cheat.log('Goodbye User!')
+}
+
+register_callback('unload', Bye)
