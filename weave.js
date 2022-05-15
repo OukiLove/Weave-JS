@@ -93,43 +93,16 @@ register_callback('player_hurt', custom_hitsound)
 
 ui.add_checkbox('Background', 'snow_background')
 
-function snow_background() 
+function snow_background()
 {
-    points: [];
-    if (!vars.get_bool('js.snow_background'))
-        return;
-
-    var alpha = ui.get_menu_alpha();
-    var count = 50;
-    var fps = 1 / global_vars.frametime()
+    points = [];
+    var alpha = ui.get_menu_alpha()
 
     if (!alpha) return;
 
-    render.filled_rect([0, 0], screen_size, [0, 0, 0, 120 * alpha], 0);
-
-    if (points.length < count)
-        points.push([math.random_int(0, screen_size[0]), math.random_int(0, screen_size[1]), math.random_int(-1, 2), math.random_int(-1, 2)])
-
-    for (i = 0; i < points.length; i++) {
-        var x = points[i][0];
-        var y = points[i][1];
-        var position = [x, y];
-        var vspeed = points[i][2];
-        var hspeed = points[i][3];
-
-        if (position[0] > screen_size[0] || position[0] < 0 || position[1] > screen_size[1] || position[1] < 0) {
-            points[i][0] = math.random_int(0, screen_size[0]);
-            points[i][1] = math.random_int(0, screen_size[1]);
-            points[i][2] = math.random_int(-1, 2);
-            points[i][3] = math.random_int(-1, 2);
-        }
-
-        if (points[i][2] == 0) points[i][2] = 1;
-        if (points[i][3] == 0) points[i][3] = 1;
-
-        render.text(position, [255, 255, 255, 255 * alpha], 12, 3, "*");
-        points[i][0] = points[i][0] + vspeed / fps * 20;
-        points[i][1] = points[i][1] + hspeed / fps * 20;
+    if (vars.get_bool('js.snow_background'))
+    {
+        render.filled_rect([0, 0], screen_size, [0, 0, 0, 80 * alpha], 0);
     }
 }
 
