@@ -91,22 +91,79 @@ function custom_hitsound()
 
 register_callback('player_hurt', custom_hitsound)
 
-ui.add_checkbox('Background', 'snow_background')
+ui.add_checkbox('Background', 'black_background')
 
-function snow_background()
+function black_background()
 {
     points = [];
     var alpha = ui.get_menu_alpha()
 
     if (!alpha) return;
 
-    if (vars.get_bool('js.snow_background'))
+    if (vars.get_bool('js.black_background'))
     {
         render.filled_rect([0, 0], screen_size, [0, 0, 0, 80 * alpha], 0);
     }
 }
 
-register_callback('render', snow_background)
+register_callback('render', black_background)
+
+ui.add_checkbox('Damage marker', 'damage_marker')
+
+function lerp(a, b, c) 
+{
+    return a+(b-a)*c;
+ };
+
+const damagemarker = {
+	hits: [],
+	event: function() {
+		var attacker = entity.get_player_for_user_id(current_event.get_int('attacker'));
+		var attacked = entity.get_player_for_user_id(current_event.get_int('userid'));
+	    var damage = current_event.get_int('dmg_health');
+	    var hitgroup = current_event.get_int('hitgroup');
+	    var color = [255, 255, 255, 255];
+	    if(hitgroup == 1) color = [0, 0, 255, 255];
+	    if (attacker == entity.get_local_player() && attacker != attacked) {
+	    	var pos = entity.get_origin(attacked)
+	    	pos[2] += 64
+	    	pos[1] += math.random_int(-10, 10);
+	    	pos[0] += math.random_int(-10, 10);
+		    damagemarker.hits.push({
+			    	ent: attacked,
+			    	position: pos,
+			    	alpha: 25550,
+			    	damage: damage,
+			    	color: color,
+			    	offset: 0
+			    });
+	    }
+	},
+	run: function() {
+		if (!vars.get_bool("js.damage_marker"))
+			return;
+
+		for (var i = 0; i < damagemarker.hits.length; i++) {
+			damagemarker.hits[i].alpha = lerp(damagemarker.hits[i].alpha,0,4*global_vars.frametime())
+			damagemarker.hits[i].color[3] = Math.min(255,damagemarker.hits[i].alpha)
+			damagemarker.hits[i].offset += 50*global_vars.frametime()
+			var position = render.world_to_screen(damagemarker.hits[i].position)
+			if (damagemarker.hits[i].alpha > 0) {
+				render.text(
+					[ position[0], position[1]-damagemarker.hits[i].offset, ],
+					damagemarker.hits[i].color, 12, 0, "" + damagemarker.hits[i].damage)
+			} else damagemarker.hits.shift();
+		}
+	},
+};
+
+register_callback('render', function(){
+    damagemarker.run();
+});
+
+register_callback("player_hurt", function() {
+	damagemarker.event();
+});
 
 function Bye()
 {
