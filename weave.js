@@ -1,6 +1,7 @@
-cheat.log("Hello user!");
-cheat.print_to_console("Script load, hello User!", [1, 1, 255]);
-utils.play_sound("C:\\Ouki76\\start.wav")
+username = 'Ouki76'
+cheat.log('Hello' + username + '!');
+cheat.print_to_console('Script load, hello ' + username + '!', [1, 1, 255]);
+utils.play_sound('C:\\Ouki76\\start.wav')
 
 var screen_size = render.get_screen_size(); // [1680, 1050]
 var localPlayer = entity.get_local_player();
@@ -35,9 +36,9 @@ ui.add_slider('Rainbow line speed', 'rainbow_line_speed', 1, 10)
 
 register_callback('render', function(){
     var realtime = global_vars.realtime();
-    var rls = vars.get_int("js.rainbow_line_speed");
+    var rls = vars.get_int('js.rainbow_line_speed');
     var hsv = HSVtoRGB(realtime * rls / 10 % 360, 1, 1);
-    if(vars.get_bool("js.rainbow_line"))
+    if(vars.get_bool('js.rainbow_line'))
     {
         render.filled_rect([0, 0], [screen_size[0], 5], [hsv.r, hsv.g, hsv.b, 255], 0);
     }
@@ -60,33 +61,46 @@ function custom_keybind_list() {
         ["peek_assist", "Auto Peek"]
     ]
     var active_keybinds_list = [];
-    var x = vars.get_int("js.keybind_poss_x");
-    var y = vars.get_int("js.keybind_poss_y");
+    var x = vars.get_int('js.keybind_poss_x');
+    var y = vars.get_int('js.keybind_poss_y');
     if (vars.get_bool('js.custom_keybind_list'))
     {
         for (var i in keybinds_list) {
             if (vars.is_bind_active(keybinds_list[i][0])) active_keybinds_list.push(i);
         }
         render.filled_rect([x - 5, y - 30], [150, 31], [0, 0, 0, 255], 5);
-        render.text([x + 40, y - 15], [255, 255, 255, 255], 12, 5, "KeyBinds");
+        render.text([x + 40, y - 15], [255, 255, 255, 255], 12, 5, 'KeyBinds');
         render.rect([x - 5, y], [150, 1], [255, 255, 255, 230], 0);
         for (var i in active_keybinds_list) {
             render.text([x, y + 15 + 15 * i - 4], [255, 255, 255, 255], 12, 5, keybinds_list[active_keybinds_list[i]][1]);
-            render.text([x + 115, y + 15 + 15 * i - 4], [255, 255, 255, 255], 12, 5, "[on]");
+            render.text([x + 115, y + 15 + 15 * i - 4], [255, 255, 255, 255], 12, 5, '[on]');
         }
     }
 }
 register_callback('render', custom_keybind_list);
 
+ui.add_checkbox('Custom watermark', 'custom_watermark')
+
+function custom_watermark()
+{
+     if (vars.get_bool('js.custom_watermark'))
+     {
+        render.filled_rect([screen_size[0] - 210, screen_size[1] - 1030], [160, 25], [0, 0, 0, 255], 5); // если у вас текст уходит за рамки, то подгоните размер под свой
+        render.text([screen_size[0] - 205, screen_size[1] - 1019], [255, 255, 255, 255], 12, 5, username + ' || oukilove.github.io');
+     }
+}
+
+register_callback('render', custom_watermark)
+
 ui.add_checkbox('Custom hitsound', 'custom_hitsound')
 
 function custom_hitsound()
 {
-    var userid = entity.get_player_for_user_id(current_event.get_int("userid"))
-    var attacker = entity.get_player_for_user_id(current_event.get_int("attacker"))
+    var userid = entity.get_player_for_user_id(current_event.get_int('userid'))
+    var attacker = entity.get_player_for_user_id(current_event.get_int('attacker'))
 
     if (attacker == entity.get_local_player() && userid != entity.get_local_player() && vars.get_bool('js.custom_hitsound'))
-        utils.play_sound("C:\\Ouki76\\hit.wav");
+        utils.play_sound('C:\\Ouki76\\hit.wav');
 }
 
 register_callback('player_hurt', custom_hitsound)
@@ -140,7 +154,7 @@ const damagemarker = {
 	    }
 	},
 	run: function() {
-		if (!vars.get_bool("js.damage_marker"))
+		if (!vars.get_bool('js.damage_marker'))
 			return;
 
 		for (var i = 0; i < damagemarker.hits.length; i++) {
@@ -161,14 +175,14 @@ register_callback('render', function(){
     damagemarker.run();
 });
 
-register_callback("player_hurt", function() {
+register_callback('player_hurt', function() {
 	damagemarker.event();
 });
 
 function Bye()
 {
     utils.play_sound('C:\\Ouki76\\bye.wav')
-    cheat.log('Goodbye User!')
+    cheat.log('Goodbye ' + username + '!')
 }
 
 register_callback('unload', Bye)
